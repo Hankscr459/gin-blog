@@ -1,7 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"gin-blog/plugins/configs"
+	"gin-blog/router"
+	"log"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	fmt.Println("run")
+	server := gin.Default()
+	if configs.CheckConnection() == 0 {
+		log.Fatal("Fail to connect DB")
+		return
+	}
+	basepath := server.Group("/v1")
+	router.RegisterUserRoutes(basepath)
+	server.Run(":1000")
 }
