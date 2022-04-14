@@ -2,7 +2,6 @@ package configs
 
 import (
 	"context"
-	"fmt"
 	"gin-blog/plugins/dto"
 	"time"
 
@@ -10,17 +9,51 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var DB = MongoCN.Database("userdb")
-var UserCol = DB.Collection("users")
+var (
+	DB      = MongoCN.Database("userdb")
+	UserCol = DB.Collection("users")
+)
 
 type UserService interface {
-	Signup(dto.SignupUser) (string, bool, error)
+	FindById(string) (*dto.ReadUser, error)
 	FindByEmail(string) (*dto.ReadUser, error)
+	FindOne(bson.M) (*dto.ReadUser, error)
+	Signup(dto.SignupUser) (string, bool, error)
 }
 type user struct{}
 
 func User() UserService {
 	return &user{}
+}
+
+func (*user) FindById(Id string) (*dto.ReadUser, error) {
+	var user *dto.ReadUser
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	objID, idErr := primitive.ObjectIDFromHex(Id)
+	if idErr != nil {
+		return nil, idErr
+	}
+	query := bson.M{"_id": objID}
+	err := UserCol.FindOne(ctx, query).Decode(&user)
+	return user, err
+}
+
+func (*user) FindByEmail(email string) (*dto.ReadUser, error) {
+	var user *dto.ReadUser
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	query := bson.M{"email": email}
+	err := UserCol.FindOne(ctx, query).Decode(&user)
+	return user, err
+}
+
+func (*user) FindOne(query bson.M) (*dto.ReadUser, error) {
+	var user *dto.ReadUser
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	err := UserCol.FindOne(ctx, query).Decode(&user)
+	return user, err
 }
 
 func (*user) Signup(u dto.SignupUser) (string, bool, error) {
@@ -34,28 +67,3 @@ func (*user) Signup(u dto.SignupUser) (string, bool, error) {
 	ObjID, _ := result.InsertedID.(primitive.ObjectID)
 	return ObjID.String(), true, nil
 }
-
-func (*user) FindByEmail(email string) (*dto.ReadUser, error) {
-	var user *dto.ReadUser
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	query := bson.M{"email": email}
-	err := UserCol.FindOne(ctx, query).Decode(&user)
-	fmt.Println("err: ", err)
-	return user, err
-}
-
-// func InsertoRegister(u models.User) (string, bool, error) {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-// 	defer cancel()
-// 	db := MongoCN.Database("go_twitter")
-// 	col := db.Collection("users")
-// 	u.Password, _ = EncriptPassword(u.Password)
-
-// 	result, err := col.InsertOne(ctx, u)
-// 	if err != nil {
-// 		return "", false, err
-// 	}
-// 	ObjID, _ := result.InsertedID.(primitive.ObjectID)
-// 	return ObjID.String(), true, nil
-// }

@@ -8,15 +8,15 @@ import (
 )
 
 var User = configs.User()
+var Error = configs.Error()
 
 func RegisterUserRoutes(rg *gin.RouterGroup) {
 	userRoute := rg.Group("/user")
 
-	userRoute.GET("/read", func(ctx *gin.Context) {
-		email := ctx.Query("email")
-		user, err := User.FindByEmail(email)
+	userRoute.GET("/:id", func(ctx *gin.Context) {
+		user, err := User.FindById(ctx.Param("id"))
 		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			Error.ErrorMessage(err, ctx)
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
