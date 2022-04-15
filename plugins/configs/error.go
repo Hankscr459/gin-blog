@@ -2,6 +2,7 @@ package configs
 
 import (
 	"errors"
+	"fmt"
 	"gin-blog/plugins/dto"
 	"net/http"
 	"reflect"
@@ -23,6 +24,7 @@ func Error() ErrorService {
 
 func (*info) DtoError(err error, c *gin.Context, model interface{}) {
 	var ve validator.ValidationErrors
+	fmt.Println("errM: ", err)
 	if errors.As(err, &ve) {
 		out := make([]dto.Error, len(ve))
 		for i, fe := range ve {
@@ -46,20 +48,21 @@ func (*info) DtoError(err error, c *gin.Context, model interface{}) {
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"errors": out})
 		c.Abort()
+	} else {
+		Error().ErrorMessage(err, c)
+		c.Abort()
 	}
 }
 
 func (*info) ErrorMessage(err error, c *gin.Context) {
-	if err != nil {
-		errorMessage := err.Error()
-		out := make([]dto.Error, 1)
-		if errorMessage == "mongo: no documents in result" {
-			out[0] = dto.Error{Message: "找不到該資料"}
-		} else if errorMessage == "the provided hex string is not a valid ObjectID" {
-			out[0] = dto.Error{Message: "Id格式不對"}
-		} else {
-			out[0] = dto.Error{Message: err.Error()}
-		}
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": out})
+	errorMessage := err.Error()
+	out := make([]dto.Error, 1)
+	if errorMessage == "mongo: no documents in result" {
+		out[0] = dto.Error{Message: "找不到該資料"}
+	} else if errorMessage == "the provided hex string is not a valid ObjectID" {
+		out[0] = dto.Error{Message: "Id格式不對"}
+	} else {
+		out[0] = dto.Error{Message: err.Error()}
 	}
+	c.JSON(http.StatusBadRequest, gin.H{"errors": out})
 }

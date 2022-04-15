@@ -4,7 +4,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type SignupUser struct {
 	Name     string `binding:"required" label:"名稱" json:"name" bson:"name"`
-	Email    string `binding:"required" label:"電子郵件" json:"email" bson:"email"`
+	Email    string `binding:"required,email" label:"電子郵件" json:"email" bson:"email"`
 	Password string `binding:"required" label:"密碼" json:"password" bson:"password"`
 }
 

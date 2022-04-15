@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	configs.Valid()
 	server := gin.Default()
 	if configs.CheckConnection() == 0 {
 		log.Fatal("Fail to connect DB")
