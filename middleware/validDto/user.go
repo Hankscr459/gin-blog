@@ -21,3 +21,15 @@ func SignupValidator() gin.HandlerFunc {
 		}
 	}
 }
+
+func SigninValidator() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user dto.SigninUser
+		if err := c.ShouldBindBodyWith(&user, binding.JSON); err != nil {
+			Error.DtoError(err, c, &user)
+		} else {
+			c.Set("SigninUser", user)
+			c.Next()
+		}
+	}
+}

@@ -13,3 +13,15 @@ type ReadUser struct {
 	Name  string             `binding:"required" label:"名稱" json:"name" bson:"name"`
 	Email string             `binding:"required" label:"電子郵件" json:"email" bson:"email"`
 }
+
+type SigninUser struct {
+	Email    string `binding:"required" label:"電子郵件" json:"email" bson:"email"`
+	Password string `binding:"required" label:"密碼" json:"password" bson:"password"`
+}
+
+type ReadUserWithPassword struct {
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id" label:"_id"`
+	Name     string             `binding:"required" label:"名稱" json:"name" bson:"name"`
+	Email    string             `binding:"required" label:"電子郵件" json:"email" bson:"email"`
+	Password string             `binding:"required" label:"密碼" json:"password" bson:"password"`
+}
