@@ -2,6 +2,7 @@ package router
 
 import (
 	"errors"
+	"gin-blog/middleware/auth"
 	"gin-blog/middleware/validDto"
 	"gin-blog/plugins/configs"
 	"gin-blog/plugins/dto"
@@ -49,7 +50,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	})
 
-	userRoute.GET("/:id", func(ctx *gin.Context) {
+	userRoute.GET("/:id", auth.User(), func(ctx *gin.Context) {
 		user, err := User.FindById(ctx.Param("id"))
 		if err != nil {
 			Error.ErrorMessage(err, ctx)
