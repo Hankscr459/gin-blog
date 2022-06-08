@@ -31,7 +31,7 @@ func CheckUser(email string, password string) (dto.ReadUserWithPassword, error) 
 	passwordDB := []byte(user.Password)
 	err = bcrypt.CompareHashAndPassword(passwordDB, passwordBytes)
 	if err != nil {
-		return *user, nil
+		return *user, err
 	}
 	return *user, nil
 }

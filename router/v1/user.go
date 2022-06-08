@@ -58,4 +58,8 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		}
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
+
+	userRoute.PUT("/:id", auth.User(), func(ctx *gin.Context) {
+		//
+	})
 }

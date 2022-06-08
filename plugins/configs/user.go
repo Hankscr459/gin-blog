@@ -56,6 +56,17 @@ func (*user) FindOne(query bson.M) (*dto.ReadUser, error) {
 	return user, err
 }
 
+func (*user) FindByIdAndUpdate(id string, update bson.M) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	objID, idErr := primitive.ObjectIDFromHex(id)
+	if idErr != nil {
+		return idErr
+	}
+	res := UserCol.FindOneAndUpdate(ctx, bson.M{"_id": objID}, update)
+	return res.Err()
+}
+
 func (*user) Signup(u dto.SignupUser) (string, bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
