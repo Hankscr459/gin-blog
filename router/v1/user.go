@@ -59,7 +59,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
 
-	userRoute.GET("/list", auth.User(), func(ctx *gin.Context) {
+	userRoute.GET("/list", func(ctx *gin.Context) {
 		user, err := User.Find()
 		if err != nil {
 			Error.ErrorMessage(err, ctx)
