@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -19,6 +20,7 @@ type UserService interface {
 	FindByEmail(string) (*dto.ReadUserWithPassword, error)
 	FindOne(bson.M) (*dto.ReadUser, error)
 	Signup(dto.SignupUser) (string, bool, error)
+	Find() ([]*dto.ReadUser, error)
 }
 type user struct{}
 
@@ -54,6 +56,25 @@ func (*user) FindOne(query bson.M) (*dto.ReadUser, error) {
 	defer cancel()
 	err := UserCol.FindOne(ctx, query).Decode(&user)
 	return user, err
+}
+
+func (*user) Find() ([]*dto.ReadUser, error) {
+	var list []*dto.ReadUser
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	condition := bson.M{}
+	options := options.Find()
+	query, err := UserCol.Find(ctx, condition, options)
+
+	for query.Next(context.TODO()) {
+		var user dto.ReadUser
+		err := query.Decode(&user)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, &user)
+	}
+	return list, err
 }
 
 func (*user) FindByIdAndUpdate(id string, update bson.M) error {
