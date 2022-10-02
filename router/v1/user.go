@@ -1,7 +1,6 @@
 package router
 
 import (
-	"errors"
 	"gin-blog/middleware/auth"
 	"gin-blog/middleware/validDto"
 	"gin-blog/plugins/configs"
@@ -36,7 +35,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		body := value.(dto.SigninUser)
 		user, err := configs.CheckUser(body.Email, body.Password)
 		if err != nil {
-			Error.ErrorMessage(errors.New("密碼錯誤"), ctx)
+			Error.ErrorMessage(err, ctx)
 			return
 		}
 		readUser := dto.ReadUser{}

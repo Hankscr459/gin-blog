@@ -24,13 +24,20 @@ func EncriptPassword(pass string) (string, error) {
 func CheckUser(email string, password string) (dto.ReadUserWithPassword, error) {
 	user, err := User().FindByEmail(email)
 	if err != nil {
-		return *user, err
+		if err.Error() == "mongo: no documents in result" {
+			return dto.ReadUserWithPassword{}, errors.New("此會員不存在")
+		} else {
+			return *user, err
+		}
 	}
 
 	passwordBytes := []byte(password)
 	passwordDB := []byte(user.Password)
 	err = bcrypt.CompareHashAndPassword(passwordDB, passwordBytes)
 	if err != nil {
+		if err.Error() == "crypto/bcrypt: hashedPassword is not the hash of the given password" {
+			return *user, errors.New("密碼錯誤")
+		}
 		return *user, err
 	}
 	return *user, nil
