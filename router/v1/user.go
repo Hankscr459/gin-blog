@@ -67,7 +67,18 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
 
-	userRoute.PUT("/:id", auth.User(), func(ctx *gin.Context) {
-		//
+	userRoute.PUT("/:id", func(ctx *gin.Context) {
+		var f map[string]interface{}
+		errBody := ctx.ShouldBindJSON(&f)
+		if errBody != nil {
+			Error.ErrorMessage(errBody, ctx)
+			return
+		}
+		err := User.FindByIdAndUpdate(ctx.Param("id"), f)
+		if err != nil {
+			Error.ErrorMessage(err, ctx)
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"success": true})
 	})
 }

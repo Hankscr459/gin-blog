@@ -20,6 +20,7 @@ type UserService interface {
 	FindByEmail(string) (*dto.ReadUserWithPassword, error)
 	FindOne(bson.M) (*dto.ReadUser, error)
 	Signup(dto.SignupUser) (string, bool, error)
+	FindByIdAndUpdate(string, map[string]interface{}) error
 	Find() ([]*dto.ReadUser, error)
 }
 type user struct{}
@@ -77,14 +78,15 @@ func (*user) Find() ([]*dto.ReadUser, error) {
 	return list, err
 }
 
-func (*user) FindByIdAndUpdate(id string, update bson.M) error {
+func (*user) FindByIdAndUpdate(id string, update map[string]interface{}) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
+
 	objID, idErr := primitive.ObjectIDFromHex(id)
 	if idErr != nil {
 		return idErr
 	}
-	res := UserCol.FindOneAndUpdate(ctx, bson.M{"_id": objID}, update)
+	res := UserCol.FindOneAndUpdate(ctx, bson.M{"_id": objID}, bson.M{"$set": update})
 	return res.Err()
 }
 
