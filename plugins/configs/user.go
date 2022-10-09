@@ -19,7 +19,6 @@ type UserService interface {
 	FindById(string) (*dto.ReadUser, error)
 	FindByEmail(string) (*dto.ReadUserWithPassword, error)
 	FindOne(bson.M) (*dto.ReadUser, error)
-	Signup(dto.SignupUser) (string, bool, error)
 	FindByIdAndUpdate(string, map[string]interface{}) error
 	Find() ([]*dto.ReadUser, error)
 }
@@ -88,18 +87,6 @@ func (*user) FindByIdAndUpdate(id string, update map[string]interface{}) error {
 	}
 	res := UserCol.FindOneAndUpdate(ctx, bson.M{"_id": objID}, bson.M{"$set": update})
 	return res.Err()
-}
-
-func (*user) Signup(u dto.SignupUser) (string, bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	u.Password, _ = EncriptPassword(u.Password)
-	result, err := UserCol.InsertOne(ctx, u)
-	if err != nil {
-		return "", false, err
-	}
-	ObjID, _ := result.InsertedID.(primitive.ObjectID)
-	return ObjID.String(), true, nil
 }
 
 func (*user) Signin(u dto.SigninUser) (string, bool, error) {
