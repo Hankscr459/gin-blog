@@ -16,9 +16,7 @@ var (
 )
 
 type UserService interface {
-	FindById(string) (*dto.ReadUser, error)
 	FindByEmail(string) (*dto.ReadUserWithPassword, error)
-	FindOne(bson.M) (*dto.ReadUser, error)
 	FindByIdAndUpdate(string, map[string]interface{}) error
 	Find() ([]*dto.ReadUser, error)
 }
@@ -28,32 +26,11 @@ func User() UserService {
 	return &user{}
 }
 
-func (*user) FindById(Id string) (*dto.ReadUser, error) {
-	var user *dto.ReadUser
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	objID, idErr := primitive.ObjectIDFromHex(Id)
-	if idErr != nil {
-		return nil, idErr
-	}
-	query := bson.M{"_id": objID}
-	err := UserCol.FindOne(ctx, query).Decode(&user)
-	return user, err
-}
-
 func (*user) FindByEmail(email string) (*dto.ReadUserWithPassword, error) {
 	var user *dto.ReadUserWithPassword
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	query := bson.M{"email": email}
-	err := UserCol.FindOne(ctx, query).Decode(&user)
-	return user, err
-}
-
-func (*user) FindOne(query bson.M) (*dto.ReadUser, error) {
-	var user *dto.ReadUser
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
 	err := UserCol.FindOne(ctx, query).Decode(&user)
 	return user, err
 }

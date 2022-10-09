@@ -28,3 +28,12 @@ func (repo *Collection[T]) FindById(id string) (*T, error) {
 
 	return &target, nil
 }
+
+func (repo *Collection[T]) FindOne(query bson.M) (*T, error) {
+	var target T
+	err := repo.collection.FindOne(DefaultContext(), query).Decode(&target)
+	if err != nil {
+		return nil, err
+	}
+	return &target, nil
+}

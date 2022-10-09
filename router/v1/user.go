@@ -55,7 +55,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 	})
 
 	userRoute.GET("/:id", func(ctx *gin.Context) {
-		user, err := User.FindById(ctx.Param("id"))
+		user, err := Coll("users", dto.ReadUser{}).FindById(ctx.Param("id"))
 		if err != nil {
 			Error.ErrorMessage(err, ctx)
 			return
