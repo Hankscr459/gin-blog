@@ -1,0 +1,14 @@
+
+[{
+  "createIndexes": "users",
+  "indexes": [
+    {
+      "key": {
+        "email": 1
+      },
+      "name": "unique_email",
+      "unique": true,
+      "background": true
+    }
+  ]
+}]
