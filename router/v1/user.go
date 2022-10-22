@@ -2,7 +2,7 @@ package router
 
 import (
 	"gin-blog/middleware/auth"
-	"gin-blog/middleware/validDto"
+	"gin-blog/middleware/valid"
 	"gin-blog/plugins/configs"
 	"gin-blog/plugins/dto"
 	"net/http"
@@ -18,9 +18,8 @@ var Error = configs.Error()
 func RegisterUserRoutes(rg *gin.RouterGroup) {
 	userRoute := rg.Group("/user")
 
-	userRoute.POST("/create", validDto.SignupValidator(), func(ctx *gin.Context) {
-		value, _ := ctx.Get("user")
-		body := value.(dto.SignupUser)
+	userRoute.POST("/create", valid.Dto[dto.SignupUser](), func(ctx *gin.Context) {
+		body := configs.Body[dto.SignupUser](ctx)
 		encodePassword, err := configs.EncriptPassword(body.Password)
 		body.Password = encodePassword
 		Error.ErrorMessage(err, ctx)
@@ -30,9 +29,8 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	})
 
-	userRoute.POST("/signin", validDto.SigninValidator(), func(ctx *gin.Context) {
-		value, _ := ctx.Get("SigninUser")
-		body := value.(dto.SigninUser)
+	userRoute.POST("/signin", valid.Dto[dto.SigninUser](), func(ctx *gin.Context) {
+		body := configs.Body[dto.SigninUser](ctx)
 		user, err := configs.CheckUser(body.Email, body.Password)
 		Error.ErrorMessage(err, ctx)
 		readUser := dto.ReadUser{}

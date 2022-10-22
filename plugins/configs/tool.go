@@ -9,6 +9,7 @@ import (
 	"gin-blog/plugins/dto"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -84,4 +85,10 @@ func ProccessToken(tk string) (*dto.Cliam, bool, string, error) {
 		return claims, false, string(""), errors.New("Token invalid")
 	}
 	return claims, false, string(""), err
+}
+
+func Body[T any](ctx *gin.Context) T {
+	value, _ := ctx.Get("reqBody")
+	body := value.(T)
+	return body
 }
