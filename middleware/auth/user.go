@@ -6,14 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var Error = configs.Error()
-
 func User() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var tk = c.Request.Header.Get("Authorization")
 		claims, _, _, err := configs.ProccessToken(tk)
 		if err != nil {
-			Error.ErrorMessage(err, c)
+			configs.ErrorMessage(err, c)
 			c.Abort()
 			return
 		} else {

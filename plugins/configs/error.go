@@ -10,18 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type info struct{}
-
-type ErrorService interface {
-	DtoError(err error, c *gin.Context, model interface{})
-	ErrorMessage(err error, c *gin.Context)
-}
-
-func Error() ErrorService {
-	return &info{}
-}
-
-func (*info) DtoError(err error, c *gin.Context, model interface{}) {
+func DtoError(err error, c *gin.Context, model interface{}) {
 	var ve validator.ValidationErrors
 	if errors.As(err, &ve) {
 		out := make([]dto.Error, len(ve))
@@ -47,12 +36,12 @@ func (*info) DtoError(err error, c *gin.Context, model interface{}) {
 		c.JSON(http.StatusBadRequest, gin.H{"errors": out})
 		c.Abort()
 	} else {
-		Error().ErrorMessage(err, c)
+		ErrorMessage(err, c)
 		c.Abort()
 	}
 }
 
-func (*info) ErrorMessage(err error, c *gin.Context) {
+func ErrorMessage(err error, c *gin.Context) {
 	if err != nil {
 		errorMessage := err.Error()
 		out := make([]dto.Error, 1)
