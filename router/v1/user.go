@@ -21,7 +21,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		encodePassword, err := configs.EncriptPassword(body.Password)
 		body.Password = encodePassword
 		configs.ErrorMessage(err, ctx)
-		Id, err := Coll("users", body).Insert(body)
+		Id, err := CollW("users").Create(body)
 		configs.ErrorMessage(err, ctx)
 		data := gin.H{"_id": Id}
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
@@ -40,7 +40,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 	})
 
 	userRoute.GET("/:id", func(ctx *gin.Context) {
-		user, err := Coll("users", dto.ReadUser{}).FindById(ctx.Param("id"))
+		user, err := CollR("users", dto.ReadUser{}).FindById(ctx.Param("id"))
 		configs.ErrorMessage(err, ctx)
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
@@ -58,7 +58,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 			u.Password = encodePassword
 			configs.ErrorMessage(matchErr, ctx)
 		}
-		err := Coll("users", u).FindByIdAndUpdate(ctx.Param("id"), u)
+		err := CollW("users").FindByIdAndUpdate(ctx.Param("id"), u)
 		configs.ErrorMessage(err, ctx)
 		ctx.JSON(http.StatusOK, gin.H{"success": true})
 	})

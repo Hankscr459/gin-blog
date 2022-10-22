@@ -1,6 +1,10 @@
 package configs
 
 import (
+	"context"
+	"os"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -8,6 +12,10 @@ import (
 
 type Collection[T Document] struct {
 	collection *mongo.Collection
+}
+
+type MyColl struct {
+	Collection *mongo.Collection
 }
 
 func (repo *Collection[T]) Insert(model T) (*mongo.InsertOneResult, error) {
@@ -38,12 +46,32 @@ func (repo *Collection[T]) FindOne(query bson.M) (*T, error) {
 	return &target, nil
 }
 
-func (repo *Collection[T]) FindByIdAndUpdate(id string, update T) error {
+func CollR[T any](collName string, dto T) *Collection[T] {
+	var db = Database{}
+	db.Connect(os.Getenv("MongoApplyURI"), "userdb")
+	return GetCollection[T](&db, collName)
+}
 
-	objID, Err := primitive.ObjectIDFromHex(id)
-	if Err != nil {
-		return Err
+func CollW(collName string) MyColl {
+	var c MyColl
+	var DB = MongoCN.Database("userdb")
+	var Collection = DB.Collection(collName)
+	c.Collection = Collection
+	return c
+}
+
+func (collW MyColl) Create(model any) (*mongo.InsertOneResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	Id, err := collW.Collection.InsertOne(ctx, model)
+	return Id, err
+}
+
+func (collW MyColl) FindByIdAndUpdate(id string, update any) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
 	}
-	res := repo.collection.FindOneAndUpdate(DefaultContext(), bson.M{"_id": objID}, bson.M{"$set": update})
+	res := collW.Collection.FindOneAndUpdate(DefaultContext(), bson.M{"_id": objID}, bson.M{"$set": update})
 	return res.Err()
 }

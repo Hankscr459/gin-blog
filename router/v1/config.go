@@ -17,7 +17,7 @@ func RegisterConfigRoutes(rg *gin.RouterGroup) {
 	configRoute.POST("/create", func(ctx *gin.Context) {
 		var b map[string]interface{}
 		err := ctx.ShouldBindJSON(&b)
-		Id, err := Coll("configs", b).Insert(b)
+		Id, err := CollW("configs").Create(b)
 		configs.ErrorMessage(err, ctx)
 		data := gin.H{"_id": Id}
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
