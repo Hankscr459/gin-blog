@@ -1,7 +1,6 @@
 package router
 
 import (
-	"gin-blog/middleware/auth"
 	"gin-blog/middleware/valid"
 	"gin-blog/plugins/configs"
 	"gin-blog/plugins/dto"
@@ -17,8 +16,8 @@ var User = configs.User()
 func RegisterUserRoutes(rg *gin.RouterGroup) {
 	userRoute := rg.Group("/user")
 
-	userRoute.POST("/create", valid.Dto[dto.SignupUser](), func(ctx *gin.Context) {
-		body := configs.Body[dto.SignupUser](ctx)
+	userRoute.POST("/create", valid.Dto[dto.SignupUserInput](), func(ctx *gin.Context) {
+		body := configs.Body[dto.SignupUserInput](ctx)
 		encodePassword, err := configs.EncriptPassword(body.Password)
 		body.Password = encodePassword
 		configs.ErrorMessage(err, ctx)
@@ -28,8 +27,8 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	})
 
-	userRoute.POST("/signin", valid.Dto[dto.SigninUser](), func(ctx *gin.Context) {
-		body := configs.Body[dto.SigninUser](ctx)
+	userRoute.POST("/signin", valid.Dto[dto.SigninUserInput](), func(ctx *gin.Context) {
+		body := configs.Body[dto.SigninUserInput](ctx)
 		user, err := configs.CheckUser(body.Email, body.Password)
 		configs.ErrorMessage(err, ctx)
 		readUser := dto.ReadUser{}
@@ -52,11 +51,14 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
 
-	userRoute.PUT("/:id", auth.User(), func(ctx *gin.Context) {
-		var f map[string]interface{}
-		err := ctx.ShouldBindJSON(&f)
-		configs.ErrorMessage(err, ctx)
-		err = User.FindByIdAndUpdate(ctx.Param("id"), f)
+	userRoute.PUT("/:id", valid.Dto[dto.UpdateUserInput](), func(ctx *gin.Context) {
+		u := configs.Body[dto.UpdateUserInput](ctx)
+		if u.Password != "" {
+			encodePassword, matchErr := configs.EncriptPassword(u.Password)
+			u.Password = encodePassword
+			configs.ErrorMessage(matchErr, ctx)
+		}
+		err := Coll("users", u).FindByIdAndUpdate(ctx.Param("id"), u)
 		configs.ErrorMessage(err, ctx)
 		ctx.JSON(http.StatusOK, gin.H{"success": true})
 	})

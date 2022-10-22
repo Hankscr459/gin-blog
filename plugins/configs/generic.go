@@ -37,3 +37,13 @@ func (repo *Collection[T]) FindOne(query bson.M) (*T, error) {
 	}
 	return &target, nil
 }
+
+func (repo *Collection[T]) FindByIdAndUpdate(id string, update T) error {
+
+	objID, Err := primitive.ObjectIDFromHex(id)
+	if Err != nil {
+		return Err
+	}
+	res := repo.collection.FindOneAndUpdate(DefaultContext(), bson.M{"_id": objID}, bson.M{"$set": update})
+	return res.Err()
+}
