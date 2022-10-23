@@ -18,6 +18,12 @@ type MyColl struct {
 	Collection *mongo.Collection
 }
 
+func CollR[T any](collName string, dto T) *Collection[T] {
+	var db = Database{}
+	db.Connect(os.Getenv("MongoApplyURI"), "userdb")
+	return GetCollection[T](&db, collName)
+}
+
 func (repo *Collection[T]) Insert(model T) (*mongo.InsertOneResult, error) {
 	Id, err := repo.collection.InsertOne(DefaultContext(), model)
 	return Id, err
@@ -46,28 +52,22 @@ func (repo *Collection[T]) FindOne(query bson.M) (*T, error) {
 	return &target, nil
 }
 
-func CollR[T any](collName string, dto T) *Collection[T] {
-	var db = Database{}
-	db.Connect(os.Getenv("MongoApplyURI"), "userdb")
-	return GetCollection[T](&db, collName)
-}
-
-func CollW(collName string) MyColl {
+func CollW(collName string) *MyColl {
 	var c MyColl
 	var DB = MongoCN.Database("userdb")
 	var Collection = DB.Collection(collName)
 	c.Collection = Collection
-	return c
+	return &c
 }
 
-func (collW MyColl) Create(model any) (*mongo.InsertOneResult, error) {
+func (collW *MyColl) Create(model any) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	Id, err := collW.Collection.InsertOne(ctx, model)
 	return Id, err
 }
 
-func (collW MyColl) FindByIdAndUpdate(id string, update any) error {
+func (collW *MyColl) FindByIdAndUpdate(id string, update any) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err

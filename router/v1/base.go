@@ -11,7 +11,7 @@ func CollR[T any](collName string, dto T) *configs.Collection[T] {
 	return coll
 }
 
-func CollW(collName string) configs.MyColl {
+func CollW(collName string) *configs.MyColl {
 	coll := configs.CollW(collName)
 	return coll
 }

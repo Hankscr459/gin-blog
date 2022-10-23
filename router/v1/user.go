@@ -1,6 +1,7 @@
 package router
 
 import (
+	"gin-blog/middleware/auth"
 	"gin-blog/middleware/valid"
 	"gin-blog/plugins/configs"
 	"gin-blog/plugins/dto"
@@ -39,7 +40,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	})
 
-	userRoute.GET("/:id", func(ctx *gin.Context) {
+	userRoute.GET("/:id", auth.User(), func(ctx *gin.Context) {
 		user, err := CollR("users", dto.ReadUser{}).FindById(ctx.Param("id"))
 		configs.ErrorMessage(err, ctx)
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
@@ -51,7 +52,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
 
-	userRoute.PUT("/:id", valid.Dto[dto.UpdateUserInput](), func(ctx *gin.Context) {
+	userRoute.PUT("/:id", auth.User(), valid.Dto[dto.UpdateUserInput](), func(ctx *gin.Context) {
 		u := configs.Body[dto.UpdateUserInput](ctx)
 		if u.Password != "" {
 			encodePassword, matchErr := configs.EncriptPassword(u.Password)
