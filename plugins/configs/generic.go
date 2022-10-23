@@ -24,11 +24,6 @@ func CollR[T any](collName string, dto T) *Collection[T] {
 	return GetCollection[T](&db, collName)
 }
 
-func (repo *Collection[T]) Insert(model T) (*mongo.InsertOneResult, error) {
-	Id, err := repo.collection.InsertOne(DefaultContext(), model)
-	return Id, err
-}
-
 func (repo *Collection[T]) FindById(id string) (*T, error) {
 	var target T
 	objID, objIDerr := primitive.ObjectIDFromHex(id)
