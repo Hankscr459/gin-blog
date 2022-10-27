@@ -45,6 +45,12 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
 
+	userRoute.GET("/t/:id", func(ctx *gin.Context) {
+		user, err := User.FindById(ctx.Param("id"))
+		ErrorMessage(err, ctx)
+		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
+	})
+
 	userRoute.GET("/list", func(ctx *gin.Context) {
 		user, err := User.Find()
 		ErrorMessage(err, ctx)
