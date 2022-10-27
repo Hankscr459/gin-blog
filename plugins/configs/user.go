@@ -20,7 +20,7 @@ var (
 type Read struct {
 	Name   string       `json:"name"`
 	Email  string       `json:"email"`
-	Friend dto.ReadUser `json:"friend"`
+	Friend dto.ReadUser `json:"friend,omitempty" bson:"friend,omitempty"`
 }
 
 type UserService interface {
@@ -84,7 +84,10 @@ func (*user) FindById(id string) (Read, error) {
 			"as":           "friend",
 		}})
 	condition = append(condition, bson.M{
-		"$unwind": "$friend"})
+		"$unwind": bson.M{
+			"path":                       "$friend",
+			"preserveNullAndEmptyArrays": true,
+		}})
 	// condition = append(condition, bson.M{
 	// 	"$project": bson.M{
 	// 		"name": 1,
