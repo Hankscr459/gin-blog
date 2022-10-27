@@ -2,6 +2,8 @@ package configs
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"gin-blog/plugins/dto"
 	"time"
 
@@ -23,7 +25,7 @@ type Read struct {
 
 type UserService interface {
 	FindByEmail(string) (*dto.ReadUserWithPassword, error)
-	FindById(string) ([]Read, error)
+	FindById(string) (Read, error)
 	Find() ([]*dto.ReadUser, error)
 }
 type user struct{}
@@ -60,10 +62,11 @@ func (*user) Find() ([]*dto.ReadUser, error) {
 	return list, err
 }
 
-func (*user) FindById(id string) ([]Read, error) {
+func (*user) FindById(id string) (Read, error) {
+	var read []Read
 	objID, objIDerr := primitive.ObjectIDFromHex(id)
 	if objIDerr != nil {
-		return nil, objIDerr
+		return Read{}, objIDerr
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -89,12 +92,16 @@ func (*user) FindById(id string) ([]Read, error) {
 	// 		"friend": 1,
 	// 	},
 	// })
-	var read []Read
+
 	cursor, err := UserCol.Aggregate(ctx, condition)
 	err = cursor.All(ctx, &read)
 	if err != nil {
-		return nil, err
+		return Read{}, err
+	}
+	fmt.Println(read)
+	if len(read) <= 0 {
+		return Read{}, errors.New("此使用者不存在")
 	}
 
-	return read, nil
+	return read[0], nil
 }
