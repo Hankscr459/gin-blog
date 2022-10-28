@@ -21,9 +21,9 @@ var (
 )
 
 type Read struct {
-	Name   string       `json:"name"`
-	Email  string       `json:"email"`
-	Friend dto.ReadUser `json:"friend,omitempty" bson:"friends,omitempty" ref:"users"`
+	Name   string        `json:"name"`
+	Email  string        `json:"email"`
+	Friend dto.ReadUser2 `json:"friend,omitempty" bson:"friend,omitempty" ref:"users"`
 }
 
 type Read2 struct {
@@ -111,13 +111,6 @@ func (*user) FindById(id string) (Read, error) {
 			"path":                       "$friend",
 			"preserveNullAndEmptyArrays": true,
 		}})
-	// condition = append(condition, bson.M{
-	// 	"$project": bson.M{
-	// 		"name": 1,
-	// 		"email": 1,
-	// 		"friend": 1,
-	// 	},
-	// })
 
 	cursor, err := UserCol.Aggregate(ctx, condition)
 	err = cursor.All(ctx, &read)

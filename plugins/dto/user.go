@@ -10,9 +10,15 @@ type SignupUserInput struct {
 }
 
 type ReadUser struct {
-	ID    primitive.ObjectID `bson:"_id,omitempty" json:"_id" label:"_id"`
-	Name  string             `binding:"required" label:"名稱" json:"name,omitempty" bson:"name"`
-	Email string             `binding:"required" label:"電子郵件" json:"email,omitempty" bson:"email"`
+	ID    string `bson:"_id" json:"_id,omitempty" label:"_id"`
+	Name  string `binding:"required" label:"名稱" json:"name,omitempty" bson:"name"`
+	Email string `binding:"required" label:"電子郵件" json:"email,omitempty" bson:"email"`
+}
+
+type ReadUser2 struct {
+	ID    string `bson:"_id" json:"_id,omitempty" label:"_id"`
+	Name  string `binding:"required" label:"名稱" json:"name,omitempty" bson:"name"`
+	Email string `binding:"required" label:"電子郵件" json:"email,omitempty" bson:"email"`
 }
 
 type SigninUserInput struct {

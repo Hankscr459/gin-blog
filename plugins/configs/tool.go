@@ -46,11 +46,10 @@ func CheckUser(email string, password string) (dto.ReadUserWithPassword, error) 
 
 func GenerJWT(t dto.ReadUser) (string, error) {
 	secret := []byte(os.Getenv("JwtSecretKey"))
-
 	payload := jwt.MapClaims{
 		"email": t.Email,
 		"name":  t.Name,
-		"_id":   t.ID.Hex(),
+		"_id":   t.ID,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
