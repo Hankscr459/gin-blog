@@ -31,10 +31,24 @@ type Read2 struct {
 	Email   string         `json:"email"`
 	Friends []dto.ReadUser `json:"friends,omitempty" bson:"friends,omitempty" ref:"users"`
 }
+
+type Read3 struct {
+	Name    string      `json:"name"`
+	Email   string      `json:"email"`
+	Friends []ReadUser3 `json:"friends,omitempty" bson:"friends,omitempty" ref:"users"`
+}
+
+type ReadUser3 struct {
+	UserId string       `json:"userId,omitempty" bson:"userId,omitempty"`
+	Desc   string       `json:"desc"`
+	Friend dto.ReadUser `json:"friend,omitempty" bson:"friend,omitempty"`
+}
+
 type UserService interface {
 	FindByEmail(string) (*dto.ReadUserWithPassword, error)
 	FindById(string) (Read, error)
 	FindById2(string) (Read2, error)
+	FindById3(string) (Read3, error)
 	Find() ([]*dto.ReadUser, error)
 }
 type user struct{}
@@ -154,6 +168,62 @@ func (*user) FindById2(id string) (Read2, error) {
 	fmt.Println(read)
 	if len(read) <= 0 {
 		return Read2{}, errors.New("此使用者不存在")
+	}
+
+	return read[0], nil
+}
+
+func (*user) FindById3(id string) (Read3, error) {
+	var read []Read3
+	objID, objIDerr := primitive.ObjectIDFromHex(id)
+	if objIDerr != nil {
+		return Read3{}, objIDerr
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	condition := make([]bson.M, 0)
+	condition = append(condition, bson.M{
+		"$match": bson.M{
+			"_id": objID,
+		},
+	})
+	condition = append(condition, bson.M{
+		"$lookup": bson.M{
+			"from":         "users",
+			"localField":   "friends.userId",
+			"foreignField": "_id",
+			"as":           "fs",
+		}})
+	condition = append(condition, bson.M{
+		"$set": bson.M{
+			"friends": bson.M{
+				"$map": bson.M{
+					"input": "$friends",
+					"in": bson.M{
+						"$mergeObjects": bson.A{
+							"$$this",
+							bson.M{
+								"friend": bson.M{
+									"$arrayElemAt": bson.A{
+										"$fs", bson.M{
+											"$indexOfArray": bson.A{"$fs._id", "$$this.userId"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}})
+	cursor, err := UserCol.Aggregate(ctx, condition)
+	err = cursor.All(ctx, &read)
+	if err != nil {
+		return Read3{}, err
+	}
+	fmt.Println(read)
+	if len(read) <= 0 {
+		return Read3{}, errors.New("此使用者不存在")
 	}
 
 	return read[0], nil
