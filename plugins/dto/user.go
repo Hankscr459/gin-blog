@@ -10,9 +10,9 @@ type SignupUserInput struct {
 }
 
 type ReadUser struct {
-	ID    primitive.ObjectID `bson:"_id,omitempty" json:"_id" label:"_id"`
-	Name  string             `binding:"required" label:"名稱" json:"name" bson:"name"`
-	Email string             `binding:"required" label:"電子郵件" json:"email" bson:"email"`
+	ID    string `bson:"_id,omitempty" json:"_id" label:"_id"`
+	Name  string `binding:"required" label:"名稱" json:"name" bson:"name"`
+	Email string `binding:"required" label:"電子郵件" json:"email" bson:"email"`
 }
 
 type SigninUserInput struct {
@@ -31,4 +31,25 @@ type UpdateUserInput struct {
 	Name     string `binding:"required" label:"名稱" json:"name" bson:"name"`
 	Email    string `binding:"required,email" label:"電子郵件" json:"email" bson:"email"`
 	Password string `label:"密碼" json:"password" bson:"password,omitempty"`
+}
+
+type Read3 struct {
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Friends []struct {
+		Desc     string `json:"desc"`
+		ReadUser `bson:",inline"`
+	} `json:"friends,omitempty" bson:"friends,omitempty" ref:"users" type:"arrayOfObjId"`
+}
+
+type Read4 struct {
+	Name    string     `json:"name"`
+	Email   string     `json:"email"`
+	Friends []ReadUser `json:"friends,omitempty" bson:"friends,omitempty" ref:"users"`
+}
+
+type Read5 struct {
+	Name   string   `json:"name"`
+	Email  string   `json:"email"`
+	Friend ReadUser `json:"friend,omitempty" bson:"friend,omitempty" ref:"users" type:"obj"`
 }

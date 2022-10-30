@@ -10,6 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/gobeam/stringy"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -50,7 +51,7 @@ func GenerJWT(t dto.ReadUser) (string, error) {
 	payload := jwt.MapClaims{
 		"email": t.Email,
 		"name":  t.Name,
-		"_id":   t.ID.Hex(),
+		"_id":   t.ID,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
@@ -91,4 +92,9 @@ func Body[T any](ctx *gin.Context) T {
 	value, _ := ctx.Get("reqBody")
 	body := value.(T)
 	return body
+}
+
+func UcFirst(value string) string {
+	container := stringy.New(value)
+	return container.UcFirst()
 }

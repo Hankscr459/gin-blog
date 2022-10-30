@@ -39,8 +39,26 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	})
 
-	userRoute.GET("/:id", auth.User(), func(ctx *gin.Context) {
+	userRoute.GET("/:id", func(ctx *gin.Context) {
 		user, err := CollR("users", dto.ReadUser{}).FindById(ctx.Param("id"))
+		ErrorMessage(err, ctx)
+		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
+	})
+
+	userRoute.GET("/t2/:id", func(ctx *gin.Context) { // 634271c62b69193cb1ba2e56 array of objectId & ...obj
+		user, err := CollR("users", dto.Read3{}).FindById(ctx.Param("id"), "friends.userId")
+		ErrorMessage(err, ctx)
+		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
+	})
+
+	userRoute.GET("/t3/:id", func(ctx *gin.Context) { // 630ec8817392454303408b33 array of only objectId
+		user, err := CollR("users", dto.Read4{}).FindById(ctx.Param("id"), "friends")
+		ErrorMessage(err, ctx)
+		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
+	})
+
+	userRoute.GET("/t4/:id", func(ctx *gin.Context) { // 630ec2d209e44eb70b2f75b4 objectId
+		user, err := CollR("users", dto.Read5{}).FindById(ctx.Param("id"), "friend")
 		ErrorMessage(err, ctx)
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
