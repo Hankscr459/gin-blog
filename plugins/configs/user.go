@@ -51,3 +51,10 @@ func (*user) Find() ([]*dto.ReadUser, error) {
 	}
 	return list, err
 }
+
+func (*user) Paginate(p dto.UserPageParamsInput) (dto.UserPageParamsInput, error) {
+	// filter := p.Filter
+	// limit, _ := strconv.ParseInt(p.Limit, 10, 64)
+	// page, _ := strconv.ParseInt(p.Page, 10, 64)
+	return p, nil
+}

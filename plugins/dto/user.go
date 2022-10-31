@@ -1,6 +1,9 @@
 package dto
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	paginate "github.com/gobeam/mongo-go-pagination"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type SignupUserInput struct {
 	Name     string `binding:"required" label:"名稱" json:"name" bson:"name"`
@@ -52,4 +55,15 @@ type Read5 struct {
 	Name   string   `json:"name"`
 	Email  string   `json:"email"`
 	Friend ReadUser `json:"friend,omitempty" bson:"friend,omitempty" ref:"users" type:"obj"`
+}
+
+type UserPageParamsInput struct {
+	Filter string `json:"filter"`
+	Limit  string `json:"limit"`
+	Page   string `json:"page"`
+}
+
+type ReadUserPage struct {
+	Data       []ReadUser              `json:"data"`
+	Pagination paginate.PaginationData `json:"pagination"`
 }
