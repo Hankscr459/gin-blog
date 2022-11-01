@@ -72,7 +72,8 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 	userRoute.GET("/list/test", func(ctx *gin.Context) {
 		Limit := ctx.Query("limit")
 		Page := ctx.Query("page")
-		user, err := User.Paginate(dto.PageParamsInput{Limit: Limit, Page: Page})
+		Filter := ctx.Query("search")
+		user, err := User.Paginate(dto.PageParamsInput{Filter: Filter, Limit: Limit, Page: Page})
 		ErrorMessage(err, ctx)
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})

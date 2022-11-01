@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gin-blog/plugins/dto"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -57,12 +58,21 @@ func (*user) Find() ([]*dto.ReadUser, error) {
 }
 
 func (*user) Paginate(p dto.PageParamsInput) (dto.ReadUserPage, error) {
+	data := dto.ReadUserPage{}
 	filter := bson.M{}
+	if p.Filter != "" {
+		field, ok := reflect.TypeOf(data).FieldByName("Data")
+		search := string(field.Tag.Get("search"))
+		fmt.Println("search: ", search)
+		if !ok {
+			panic("Field not found")
+		}
+		filter[search] = p.Filter
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	limit, _ := strconv.ParseInt(p.Limit, 10, 64)
 	page, _ := strconv.ParseInt(p.Page, 10, 64)
-	data := dto.ReadUserPage{}
 	paginatedData, err := paginate.New(UserCol).Context(ctx).Limit(limit).Filter(filter).Page(page).Decode(&data.Data).Find()
 	if err != nil {
 		fmt.Println("err: ", err)

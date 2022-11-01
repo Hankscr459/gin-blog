@@ -56,14 +56,7 @@ type Read5 struct {
 	Email  string   `json:"email"`
 	Friend ReadUser `json:"friend,omitempty" bson:"friend,omitempty" ref:"users" type:"obj"`
 }
-
-type UserPageParamsInput struct {
-	Filter string `json:"filter"`
-	Limit  string `json:"limit"`
-	Page   string `json:"page"`
-}
-
 type ReadUserPage struct {
-	Data       []ReadUser              `json:"data"`
-	Pagination paginate.PaginationData `json:"pagination"`
+	Data       []ReadUser              `json:"docs" search:"name" bson:"Data"`
+	Pagination paginate.PaginationData `json:"paginate"`
 }
