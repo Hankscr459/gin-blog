@@ -152,6 +152,20 @@ func (repo *Collection[T]) FindOne(query bson.M) (*T, error) {
 
 func (repo *Collection[T]) Paginate(p dto.PageParamsInput) (PageList[T], error) {
 	var data PageList[T]
+
+	if p.Limit == "" {
+		p.Limit = "10"
+	}
+	if p.Page == "" {
+		p.Page = "1"
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	limit, _ := strconv.ParseInt(p.Limit, 10, 64)
+	page, _ := strconv.ParseInt(p.Page, 10, 64)
+
+	query := paginate.New(UserCol).Context(ctx).Limit(limit)
+
 	filter := bson.M{}
 	if p.Filter != "" {
 		cond := []bson.M{}
@@ -165,11 +179,17 @@ func (repo *Collection[T]) Paginate(p dto.PageParamsInput) (PageList[T], error) 
 			"$or": cond,
 		}
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	limit, _ := strconv.ParseInt(p.Limit, 10, 64)
-	page, _ := strconv.ParseInt(p.Page, 10, 64)
-	paginatedData, err := paginate.New(UserCol).Context(ctx).Limit(limit).Filter(filter).Page(page).Decode(&data.Data).Find()
+	query = query.Filter(filter)
+	query = query.Page(page)
+	sortList := strings.Split(p.Sort, ",")
+	fmt.Println("len(p.Sort): ", len(sortList))
+	fmt.Println("sortList: ", sortList)
+	if len(sortList) == 2 {
+
+		ascDesc, _ := strconv.ParseInt(sortList[1], 10, 64)
+		query = query.Sort(sortList[0], ascDesc)
+	}
+	paginatedData, err := query.Decode(&data.Data).Find()
 	if err != nil {
 		fmt.Println("err: ", err)
 		panic(err)
