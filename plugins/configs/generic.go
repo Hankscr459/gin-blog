@@ -3,11 +3,14 @@ package configs
 import (
 	"context"
 	"fmt"
+	"gin-blog/plugins/dto"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
+	paginate "github.com/gobeam/mongo-go-pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,6 +22,11 @@ type Collection[T Document] struct {
 
 type MyColl struct {
 	Collection *mongo.Collection
+}
+
+type PageList[T any] struct {
+	Data       []T                     `json:"docs" search:"name" bson:"Data"`
+	Pagination paginate.PaginationData `json:"paginate"`
 }
 
 func CollR[T any](collName string, dto T) *Collection[T] {
@@ -140,6 +148,34 @@ func (repo *Collection[T]) FindOne(query bson.M) (*T, error) {
 		return nil, err
 	}
 	return &target, nil
+}
+
+func (repo *Collection[T]) Paginate(p dto.PageParamsInput) (PageList[T], error) {
+	var data PageList[T]
+	filter := bson.M{}
+	if p.Filter != "" {
+		cond := []bson.M{}
+		for _, s := range p.SearchType {
+			cond = append(cond, bson.M{
+				s: p.Filter,
+			})
+			// filter[s] = p.Filter
+		}
+		filter = bson.M{
+			"$or": cond,
+		}
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	limit, _ := strconv.ParseInt(p.Limit, 10, 64)
+	page, _ := strconv.ParseInt(p.Page, 10, 64)
+	paginatedData, err := paginate.New(UserCol).Context(ctx).Limit(limit).Filter(filter).Page(page).Decode(&data.Data).Find()
+	if err != nil {
+		fmt.Println("err: ", err)
+		panic(err)
+	}
+	data.Pagination = paginatedData.Pagination
+	return data, nil
 }
 
 func CollW(collName string) *MyColl {

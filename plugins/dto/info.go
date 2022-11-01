@@ -5,7 +5,8 @@ type Error struct {
 }
 
 type PageParamsInput struct {
-	Filter string `json:"filter"`
-	Limit  string `json:"limit"`
-	Page   string `json:"page"`
+	Filter     string   `json:"filter"`
+	SearchType []string `json:"search_type"`
+	Limit      string   `json:"limit"`
+	Page       string   `json:"page"`
 }

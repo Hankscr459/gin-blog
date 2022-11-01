@@ -70,10 +70,13 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 	})
 
 	userRoute.GET("/list/test", func(ctx *gin.Context) {
-		Limit := ctx.Query("limit")
-		Page := ctx.Query("page")
-		Filter := ctx.Query("search")
-		user, err := User.Paginate(dto.PageParamsInput{Filter: Filter, Limit: Limit, Page: Page})
+		query := dto.PageParamsInput{
+			Filter:     ctx.Query("search"),
+			SearchType: []string{"name", "email"},
+			Limit:      ctx.Query("limit"),
+			Page:       ctx.Query("page"),
+		}
+		user, err := CollR("users", dto.ReadUser{}).Paginate(query)
 		ErrorMessage(err, ctx)
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": user})
 	})
