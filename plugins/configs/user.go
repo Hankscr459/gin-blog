@@ -19,7 +19,7 @@ var (
 
 type UserService interface {
 	FindByEmail(string) (*dto.ReadUserWithPassword, error)
-	Paginate(dto.UserPageParamsInput) (dto.ReadUserPage, error)
+	Paginate(dto.PageParamsInput) (dto.ReadUserPage, error)
 	Find() ([]*dto.ReadUser, error)
 }
 type user struct{}
@@ -56,20 +56,18 @@ func (*user) Find() ([]*dto.ReadUser, error) {
 	return list, err
 }
 
-func (*user) Paginate(p dto.UserPageParamsInput) (dto.ReadUserPage, error) {
+func (*user) Paginate(p dto.PageParamsInput) (dto.ReadUserPage, error) {
 	filter := bson.M{}
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	limit, _ := strconv.ParseInt(p.Limit, 10, 64)
 	page, _ := strconv.ParseInt(p.Page, 10, 64)
-	var products []dto.ReadUser
-	paginatedData, err := paginate.New(UserCol).Context(ctx).Limit(limit).Filter(filter).Page(page).Decode(&products).Find()
+	data := dto.ReadUserPage{}
+	paginatedData, err := paginate.New(UserCol).Context(ctx).Limit(limit).Filter(filter).Page(page).Decode(&data.Data).Find()
 	if err != nil {
 		fmt.Println("err: ", err)
 		panic(err)
 	}
-	data := dto.ReadUserPage{
-		Pagination: paginatedData.Pagination, Data: products,
-	}
+	data.Pagination = paginatedData.Pagination
 	return data, nil
 }
