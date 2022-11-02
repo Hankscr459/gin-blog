@@ -3,6 +3,7 @@ package router
 import (
 	"gin-blog/middleware/valid"
 	"gin-blog/plugins/configs"
+	"gin-blog/plugins/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,4 +30,8 @@ func ErrorMessage(err error, ctx *gin.Context) {
 
 func Body[T any](ctx *gin.Context) T {
 	return configs.Body[T](ctx)
+}
+
+func Profile(ctx *gin.Context) *dto.Cliam {
+	return configs.Profile(ctx)
 }

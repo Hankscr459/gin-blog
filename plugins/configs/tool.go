@@ -2,6 +2,7 @@ package configs
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -54,6 +55,7 @@ func GenerJWT(t dto.ReadUser) (string, error) {
 		"_id":   t.ID,
 		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
+	fmt.Println("t.ID: ", t)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	tokenStr, err := token.SignedString(secret)
 	if err != nil {
@@ -92,6 +94,13 @@ func Body[T any](ctx *gin.Context) T {
 	value, _ := ctx.Get("reqBody")
 	body := value.(T)
 	return body
+}
+
+func Profile(ctx *gin.Context) *dto.Cliam {
+	value, _ := ctx.Get("claims")
+	user := value.(*dto.Cliam)
+	fmt.Println("decode: ", user)
+	return user
 }
 
 func UcFirst(value string) string {

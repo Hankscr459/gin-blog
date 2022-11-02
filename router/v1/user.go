@@ -33,6 +33,7 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		ErrorMessage(err, ctx)
 		readUser := dto.ReadUser{}
 		copier.Copy(&readUser, user)
+		readUser.ID = user.ID.Hex()
 		tk, err := configs.GenerJWT(readUser)
 		ErrorMessage(err, ctx)
 		data := gin.H{"token": tk}

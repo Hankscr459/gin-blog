@@ -26,5 +26,6 @@ func main() {
 	basepath := server.Group("/v1")
 	router.RegisterUserRoutes(basepath)
 	router.RegisterConfigRoutes(basepath)
+	router.RegisterOrgRoutes(basepath)
 	server.Run(os.Getenv("PORT"))
 }

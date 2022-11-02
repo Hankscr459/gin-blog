@@ -2,6 +2,7 @@ package configs
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"gin-blog/plugins/dto"
 	"os"
@@ -76,7 +77,7 @@ func (repo *Collection[T]) FindById(id string, args ...string) (T, error) {
 			fnList := strings.Split(val, ".")
 			field, ok := reflect.TypeOf(read).Elem().FieldByName(UcFirst(fnList[0]))
 			if !ok {
-				panic("Field not found")
+				return target, errors.New("Field not found")
 			}
 
 			ref := string(field.Tag.Get("ref"))
@@ -107,7 +108,7 @@ func (repo *Collection[T]) FindById(id string, args ...string) (T, error) {
 					}})
 				condition = append(condition, bson.M{
 					"$set": bson.M{
-						fmt.Sprintf("%s", fnList[0]): bson.M{
+						fnList[0]: bson.M{
 							"$map": bson.M{
 								"input": fmt.Sprintf("$%s", fnList[0]),
 								"in": bson.M{
