@@ -129,9 +129,7 @@ func (repo *Collection[T]) FindById(id string, args ...string) (T, error) {
 
 		}
 		cursor, err := repo.collection.Aggregate(ctx, condition)
-		fmt.Println("3: ", read)
 		err = cursor.All(ctx, &read)
-		fmt.Println("4: ", read)
 		if err != nil {
 			fmt.Println("err: ", err)
 			return target, err
