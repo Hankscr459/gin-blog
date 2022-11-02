@@ -57,6 +57,6 @@ type Read5 struct {
 	Friend ReadUser `json:"friend,omitempty" bson:"friend,omitempty" ref:"users" type:"obj"`
 }
 type ReadUserPage struct {
-	Data       []ReadUser              `json:"docs" search:"name" bson:"Data"`
+	Data       []ReadUser              `json:"docs" search:"name" bson:"Data" deSelect:"password,email"`
 	Pagination paginate.PaginationData `json:"paginate"`
 }
