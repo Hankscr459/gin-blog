@@ -184,12 +184,20 @@ func (repo *Collection[T]) Paginate(p dto.PageParamsInput) (PageList[T], error) 
 	}
 	query = query.Filter(filter)
 	query = query.Page(page)
-	sortList := strings.Split(p.Sort, ",")
+	sortList := strings.Split(p.Ctx.Query("sortBy"), ",")
 	if len(sortList) == 2 {
-
 		ascDesc, _ := strconv.ParseInt(sortList[1], 10, 64)
 		query = query.Sort(sortList[0], ascDesc)
 	}
+
+	if len(p.DeSelect) > 0 {
+		condDeSelect := bson.D{}
+		for _, d := range p.DeSelect {
+			condDeSelect = append(condDeSelect, bson.E{Key: d, Value: false})
+		}
+		query = query.Select(condDeSelect)
+	}
+
 	paginatedData, err := query.Decode(&data.Data).Find()
 	if err != nil {
 		fmt.Println("err: ", err)

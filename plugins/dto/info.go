@@ -9,5 +9,6 @@ type Error struct {
 type PageParamsInput struct {
 	Ctx        *gin.Context `json:"ctx" bson:"Ctx"`
 	SearchType []string     `json:"search_type"`
-	Sort       string       `json:"sort"` // "asc" or "desc" 1, -1 exp: price,-1
+	// "asc" or "desc" 1, -1 exp: price,-1
+	DeSelect []string `json:"de_select"`
 }

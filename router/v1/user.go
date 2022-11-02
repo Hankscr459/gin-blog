@@ -73,7 +73,6 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 		query := dto.PageParamsInput{
 			Ctx:        ctx,
 			SearchType: []string{"name", "email"},
-			Sort:       ctx.Query("sortBy"),
 		}
 		user, err := CollR("users", dto.ReadUser{}).Paginate(query)
 		ErrorMessage(err, ctx)
