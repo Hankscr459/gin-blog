@@ -1,7 +1,6 @@
 package dto
 
 import (
-	paginate "github.com/gobeam/mongo-go-pagination"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -55,8 +54,4 @@ type Read5 struct {
 	Name   string   `json:"name"`
 	Email  string   `json:"email"`
 	Friend ReadUser `json:"friend,omitempty" bson:"friend,omitempty" ref:"users" type:"obj"`
-}
-type ReadUserPage struct {
-	Data       []ReadUser              `json:"docs" search:"name" bson:"Data" deSelect:"password,email"`
-	Pagination paginate.PaginationData `json:"paginate"`
 }
