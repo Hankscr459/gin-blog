@@ -2,10 +2,13 @@ package router
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"gin-blog/plugins/configs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tidwall/gjson"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,5 +40,16 @@ func RegisterConfigRoutes(rg *gin.RouterGroup) {
 			}
 		}
 		ctx.JSON(http.StatusOK, gin.H{"success": true})
+	})
+
+	configRoute.GET("/test/:id", func(ctx *gin.Context) {
+		var b map[string]interface{}
+		err := ctx.ShouldBindJSON(&b)
+		config, err := CollR("configs", b).FindById(ctx.Param("id"))
+		ErrorMessage(err, ctx)
+		v, _ := json.Marshal(config)
+		fmt.Println("string(yfile): ", string(v))
+		value := gjson.Get(string(v), "data.myObj.objKey")
+		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": value.String()})
 	})
 }
