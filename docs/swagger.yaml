@@ -1,0 +1,80 @@
+swagger: '2.0'
+x-stoplight:
+  id: cya2t9yz5i07j
+info:
+  title: goBlog
+  version: '1.0'
+host: 'localhost:1000'
+schemes:
+  - http
+produces:
+  - application/json
+consumes:
+  - application/json
+paths:
+  /v1/user/signin:
+    post:
+      summary: 登入
+      operationId: post-user
+      responses:
+        '200':
+          description: User Created
+          schema:
+            $ref: '#/definitions/ReSigninUser'
+        '400':
+          description: Missing Required Information
+          schema:
+            type: 'null'
+        '409':
+          description: Email Already Taken
+          schema:
+            type: 'null'
+      description: Create a new user.
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: Email欄位
+              password:
+                type: string
+                description: 密碼欄位
+            required:
+              - firstName
+              - lastName
+              - email
+              - dateOfBirth
+          description: Post the necessary fields for the API to create a new user.
+          x-examples:
+            Create User Bob Fellow:
+              email: bob.fellow@gmail.com
+      tags:
+        - 認證相關
+    parameters: []
+definitions:
+  ReSigninUser:
+    title: ReSigninUser
+    type: object
+    description: ''
+    properties:
+      success:
+        type: boolean
+        format: email
+        description: Email欄位
+      data:
+        type: object
+        format: date
+        description: 密碼欄位
+        properties:
+          token:
+            type: string
+            description: 權杖
+    x-examples:
+      example-1:
+        success: true
+        data:
+          token: string

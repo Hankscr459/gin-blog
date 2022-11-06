@@ -1,14 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"gin-blog/plugins/configs"
 	"gin-blog/router/v1"
 	"log"
 	"os"
 
+	_ "gin-blog/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -27,5 +32,8 @@ func main() {
 	router.RegisterUserRoutes(basepath)
 	router.RegisterConfigRoutes(basepath)
 	router.RegisterOrgRoutes(basepath)
-	server.Run(os.Getenv("PORT"))
+	port := os.Getenv("PORT")
+	url := ginSwagger.URL(fmt.Sprintf("http://127.0.0.1%s/swagger/doc.json", port))
+	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	server.Run(port)
 }
