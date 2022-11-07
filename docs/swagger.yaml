@@ -55,6 +55,26 @@ paths:
       tags:
         - 認證相關
     parameters: []
+  '/v1/user/{id}':
+    parameters:
+      - type: string
+        name: id
+        in: path
+        required: true
+        description: 使用者Id
+    get:
+      summary: 查看使用者
+      tags:
+        - 使用者
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ResReadUser'
+      operationId: get-v1-user-id
+      security:
+        - Authorization: []
+      description: ''
 definitions:
   ReSigninUser:
     title: ReSigninUser
@@ -78,3 +98,30 @@ definitions:
         success: true
         data:
           token: string
+  ResReadUser:
+    title: ResReadUser
+    x-stoplight:
+      id: 9y351y1qgtelw
+    type: object
+    properties:
+      success:
+        type: boolean
+      data:
+        type: object
+        properties:
+          _id:
+            type: string
+            description: 使用者Id
+          name:
+            type: string
+            description: 使用者名稱
+          email:
+            type: string
+            description: Email
+securityDefinitions:
+  Authorization:
+    name: Authorization
+    type: apiKey
+    in: header
+security:
+  - API Key - 1: []

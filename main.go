@@ -33,6 +33,7 @@ func main() {
 	router.RegisterConfigRoutes(basepath)
 	router.RegisterOrgRoutes(basepath)
 	port := os.Getenv("PORT")
+	// http://localhost:1000/swagger/index.html
 	url := ginSwagger.URL(fmt.Sprintf("http://127.0.0.1%s/swagger/doc.json", port))
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	server.Run(port)
