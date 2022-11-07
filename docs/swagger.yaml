@@ -123,5 +123,8 @@ securityDefinitions:
     name: Authorization
     type: apiKey
     in: header
+    description: |-
+      輸入 Bearer,空一格,帶入TOKEN
+      Bearer {teokn}
 security:
   - API Key - 1: []
