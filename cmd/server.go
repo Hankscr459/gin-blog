@@ -19,6 +19,8 @@ import (
 )
 
 var port string
+var runSwagger bool
+
 var serverCmd = &cobra.Command{
 	Use: "server",
 	Run: func(c *cobra.Command, args []string) {
@@ -38,8 +40,10 @@ var serverCmd = &cobra.Command{
 		router.RegisterConfigRoutes(basepath)
 		router.RegisterOrgRoutes(basepath)
 		// http://localhost:1000/swagger/index.html
-		url := ginSwagger.URL(fmt.Sprintf("http://127.0.0.1:%s/swagger/doc.json", port))
-		server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+		if runSwagger {
+			url := ginSwagger.URL(fmt.Sprintf("http://127.0.0.1:%s/swagger/doc.json", port))
+			server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+		}
 		server.Run(":" + port)
 	},
 }
@@ -48,4 +52,6 @@ func init() {
 	rootCmd.AddCommand(serverCmd)
 	// --p YourPort
 	serverCmd.Flags().StringVar(&port, "p", os.Getenv("PORT"), "PORT")
+	// -d
+	serverCmd.Flags().BoolVarP(&runSwagger, "docs", "d", false, "Api 文件明細")
 }
