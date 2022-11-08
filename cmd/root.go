@@ -7,12 +7,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "0.0.1"
+var version = "0.0.2"
 var rootCmd = &cobra.Command{
 	Use:     "Gin_Blog",
 	Version: version,
 	Short:   "Mongodb Gin Web Server",
-	Long:    `Mongodb Gin Web Server Cli Web Dev`,
+	Long: `
+		Mongodb Gin Web Server Cli Web Dev
+		server: --p YourPORT // default = env.Port
+		apiDocs: -d          // default = false
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 	},
