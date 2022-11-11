@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -20,9 +21,11 @@ type Database struct {
 }
 
 var MongoCN = connectDb()
-var clientOptions = options.Client().ApplyURI(os.Getenv("MongoApplyURI"))
 
 func connectDb() *mongo.Client {
+	godotenv.Load("../.env")
+	CheckTestMode()
+	var clientOptions = options.Client().ApplyURI(os.Getenv("MongoApplyURI"))
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -79,4 +82,13 @@ func DefaultContext() context.Context {
 
 func GetCollection[T Document](db *Database, collectionName string) *Collection[T] {
 	return &Collection[T]{db.db.Collection(collectionName)}
+}
+
+func CheckTestMode() {
+	if len(os.Args) > 0 {
+		if os.Args[1] != "server" {
+			os.Setenv("Mode", "test")
+			os.Setenv("DbName", "userDb-test")
+		}
+	}
 }

@@ -6,6 +6,7 @@ import (
 	"gin-blog/plugins/dto"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var db = configs.Database{}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"gin-blog/plugins/configs"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,7 +24,7 @@ func RegisterConfigRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 	})
 	configRoute.GET("/create-index", func(ctx *gin.Context) {
-		db := configs.MongoCN.Database("userdb")
+		db := configs.MongoCN.Database(os.Getenv("DbName"))
 		for _, f := range []string{"name", "email"} {
 			_, err := db.Collection("users").Indexes().CreateOne(
 				context.Background(),

@@ -32,7 +32,7 @@ type PageList[T any] struct {
 
 func CollR[T any](collName string, dto T) *Collection[T] {
 	var db = Database{}
-	db.Connect(os.Getenv("MongoApplyURI"), "userdb")
+	db.Connect(os.Getenv("MongoApplyURI"), os.Getenv("DbName"))
 	return GetCollection[T](&db, collName)
 }
 
@@ -208,7 +208,7 @@ func (repo *Collection[T]) Paginate(p dto.PageParamsInput) (PageList[T], error) 
 
 func CollW(collName string) *MyColl {
 	var c MyColl
-	var DB = MongoCN.Database("userdb")
+	var DB = connectDb().Database(os.Getenv("DbName"))
 	var Collection = DB.Collection(collName)
 	c.Collection = Collection
 	return &c

@@ -3,6 +3,7 @@ package configs
 import (
 	"context"
 	"gin-blog/plugins/dto"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +11,7 @@ import (
 )
 
 var (
-	DB      = MongoCN.Database("userdb")
+	DB      = MongoCN.Database(os.Getenv("DbName"))
 	UserCol = DB.Collection("users")
 )
 
