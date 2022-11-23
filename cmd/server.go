@@ -36,9 +36,15 @@ var serverCmd = &cobra.Command{
 			return
 		}
 		basepath := server.Group("/v1")
+
+		server.NoRoute(func(c *gin.Context) {
+			c.JSON(404, gin.H{"success": false, "status": 404, "message": "Page not found"})
+		})
+
 		router.RegisterUserRoutes(basepath)
 		router.RegisterConfigRoutes(basepath)
 		router.RegisterOrgRoutes(basepath)
+
 		// http://localhost:1000/swagger/index.html
 		if runSwagger {
 			url := ginSwagger.URL(fmt.Sprintf("http://127.0.0.1:%s/swagger/doc.json", port))
