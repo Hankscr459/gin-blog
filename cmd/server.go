@@ -38,7 +38,12 @@ var serverCmd = &cobra.Command{
 		basepath := server.Group("/v1")
 
 		server.NoRoute(func(c *gin.Context) {
-			c.JSON(404, gin.H{"success": false, "status": 404, "message": "Page not found"})
+			c.JSON(404, gin.H{
+				"success": false,
+				"status":  404,
+				"message": "Page not found",
+				"errors":  []string{"此Api不存在"},
+			})
 		})
 
 		router.RegisterUserRoutes(basepath)

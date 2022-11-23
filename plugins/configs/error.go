@@ -33,10 +33,8 @@ func DtoError(err error, c *gin.Context, model interface{}) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"status":  400,
-			"message": "Dto驗證錯誤",
-			"error": gin.H{
-				"list": out,
-			},
+			"message": "驗證錯誤",
+			"errors":  out,
 		})
 		c.Abort()
 	} else {
@@ -57,7 +55,7 @@ func ErrorMessage(err error, c *gin.Context) {
 			"success": false,
 			"status":  400,
 			"message": errorMessage,
-			"error":   err,
+			"errors":  []string{errorMessage},
 		})
 		panic(err.Error())
 	}
